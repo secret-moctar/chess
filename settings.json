@@ -1,0 +1,15 @@
+{
+    "theme":{
+        "background":"#404041"
+    },
+
+    "button":{
+        "gap": 30,
+        "background":[120, 161, 209, 255],
+        "sbackground":[104, 159, 56, 255],
+        "text":[255, 255, 255, 255],
+        "stext":[255, 255, 255, 255],
+        "shape":"rounded"
+    }
+
+}

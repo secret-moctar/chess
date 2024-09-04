@@ -1,0 +1,12 @@
+{
+    "Welcome": {
+        "imgs": {
+            "header": {"path":"chess_title.png", "pos":[0.5, 0.2] },
+            "info": {"path":"icons8-github-64.png", "pos":[0.95 ,0.95]}
+        },
+        "stack":{
+            "pos":[0.5, 0.4],
+            "buttons":["Play", "music", "settings", "Quit"]
+        }
+    }
+}
