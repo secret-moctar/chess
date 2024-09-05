@@ -1,9 +1,25 @@
 # Usage
 to be able to play this chess game python3 must be install and pip in the system path
 after checking that python is installed and pip is available you can create a python virtual enviromnent
-#optional
-`python -m venv .venv`
+- optional
+```command
+python -m venv .venv
+```
 after creating the venv you have to activate it
+
+```command
+.venv\Scripts\activate
+```
+if you are getting some policy erros on window try
+```PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 or just install the required python packages
-#must
-`pip -r install requirement.txt`
+- must
+```command
+pip -r install requirement.txt
+```
+
+# Excute
+to excute the game after following the steps in the usage paragraph run
+`python main.py`
