@@ -11,14 +11,18 @@ WIN_WIDTH = 800
 WIN_HEIGHT = 600
 
 class Button:
-    def __init__(self, text, font, tcolor):
+    def __init__(self, text, font, tcolor, bcolor, s_bcolor):
         self.text = text
-        self.img = font.render(self.text, True, tcolor)
+        self.font = font
+        self.tcolor = tcolor
+        self.img = self.draw()
         self.rect = self.img.get_rect(topleft=(0, 0)).inflate(30, 10)
+        self.bcolor = bcolor
+        self.s_bcolor = s_bcolor
         self.hightlight = False
 
-    def set_color(tcolor):
-        self.img = font.render(self.text, True, tcolor)
+    def draw(self):
+        return self.font.render(self.text, True, self.tcolor)
 
     def update(self, mos_pos):
         if self.rect.collidepoint(*mos_pos):
@@ -27,23 +31,36 @@ class Button:
             self.hightlight = False
 
 
-class CompButton:
-    def __init__(self, text, font, tcolor, bcolor):
-        self.text = text
+class CompButton(Button):
+    def __init__(self, text, font, tcolor, bcolor, s_bcolor, tabs, paths):
         self.t_gap = 5
-        self.cmps = []
-        self.img = None
-        self.surf = self.compose()
+        self.tabs = tabs
+        self.paths = paths
+        super().__init__(text, font, tcolor, bcolor, s_bcolor)
 
-    def add_component(self, path):
-        self.cmps.add(pg.image.load(path).convert())
+    def update(self, mos_pos):
+        super().update(mos_pos)
 
-    def compose(self):
-        width, height = self.t_gap, self.t_gap
-        for cmp in self.cmps:
-            width += cmp.get_width() + self.t_gap
-        height += max(self.cmps, key=lambda x:x.get_height()).get_height() + self.t_gap
-        return pg.Surface((width, height))
+    def load_imgs(self):
+        imgs = []
+        for path in self.paths:
+            if path in os.listdir(ICONDIR): 
+                imgs.append(pg.transform.scale_by(pg.image.load(os.path.join(ICONDIR, path)).convert_alpha(), 0.5))
+            else:
+                imgs.append(self.font.render(self.text, True, self.tcolor))
+        return imgs
+
+    def draw(self):
+        self.imgs = self.load_imgs()
+        width, height = sum(map(lambda x:x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x:x.get_height()).get_height() + 2 * self.t_gap
+        img = pg.Surface((width, height))
+        img.fill((100, 100, 100))
+        img.set_colorkey((100, 100, 100))
+        x, y = self.tabs[0], height // 2
+        for i in range(len(self.imgs)):
+            img.blit(self.imgs[i], (x, y - self.imgs[i].get_height() // 2))
+            x += self.imgs[i].get_width() + self.tabs[i + 1]
+        return img
 
 class StackButton:
     def __init__(self, pos, tcolor, bcolor, s_bcolor):
@@ -76,7 +93,10 @@ class StackButton:
             roundness = 0
             if shape == "rounded": roundness = 7
             button = self.stack[i]
-            bcolor, inflame = (self.bcolor, (30, 10)) if not button.hightlight else (self.s_bcolor, (40, 15))
+            bcolor = self.bcolor if button.bcolor == "theme" else button.bcolor
+            s_bcolor = self.s_bcolor if button.s_bcolor == "theme" else button.s_bcolor
+            bcolor, inflame = (bcolor, (30, 10)) if not button.hightlight else (s_bcolor, (40, 15))
+
             button.rect = button.img.get_rect(center=(self.pos[0], self.pos[1] + acc)).inflate(*inflame)
             pg.draw.rect(screen, bcolor, button.rect, border_radius=roundness)
             screen.blit(button.img, (button.rect.centerx - button.img.get_width() // 2, button.rect.centery - button.img.get_height() // 2))
@@ -109,8 +129,12 @@ class UiEngine:
                 pos = self.layout_info[menu][key]["pos"]
                 pos = WIN_WIDTH * pos[0], WIN_HEIGHT * pos[1]
                 structure["stack"] = StackButton(pos, self.tcolor, self.bcolor, self.s_bcolor)
-                for button in self.layout_info[menu][key]["buttons"]:
-                    structure["stack"].push(Button(button, self.font, self.tcolor))
+                for but_tex in self.layout_info[menu][key]["buttons"]:
+                    button = self.layout_info[menu][key]["buttons"][but_tex]
+                    if button["type"] == "simple":
+                        structure["stack"].push(Button(but_tex, self.font, self.tcolor, button["bcolor"], button["s_bcolor"]))
+                    elif button["type"] == "complex": 
+                        structure["stack"].push(CompButton(but_tex, self.font, self.tcolor, button["bcolor"], button["s_bcolor"], button["tabs"], button["paths"]))
         return structure
         
 
