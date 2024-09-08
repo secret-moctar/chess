@@ -7,10 +7,10 @@
         "stack":{
             "pos":[0.5, 0.4],
             "buttons":{
-                "Play":{"type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-battle-48.png", "Play", "icons8-battle-48.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
-                "music":{"type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-musical-note-50.png", "music", "icons8-musical-note-50.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
-                "settings":{"type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-settings-40.png", "music", "icons8-settings-40.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
-                "Quit":{"type":"simple", "bcolor":"#FF8888", "s_bcolor":"#FF0000", "event":""}
+                "Play":{"id":1, "type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-battle-48.png", "Play", "icons8-battle-48.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
+                "music":{"id":2, "type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-musical-note-50.png", "music", "icons8-musical-note-50.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
+                "settings":{"id":3, "type":"complex", "tabs":[0, 15, 15, 0], "paths":["icons8-settings-40.png", "music", "icons8-settings-40.png"], "bcolor":"theme", "s_bcolor":"theme", "event":""},
+                "Quit":{"id":0, "type":"simple", "bcolor":"#FF8888", "s_bcolor":"#FF0000", "event":""}
             }
         }
     }
