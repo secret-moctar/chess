@@ -82,6 +82,12 @@ class StackButton:
 
     def update(self, mos_pos):
         self.check_collide(mos_pos)
+        if self.s_event:
+            event = self.s_event.pop(0)
+            if EVENT_ARG[event]:
+                EVENT_ACTION[event](EVENT_ARG[event])
+            else:
+                EVENT_ACTION[event]()
 
     def check_collide(self, mos_pos):
         for button in self.stack:
@@ -91,12 +97,11 @@ class StackButton:
         for button in self.stack:
                 if button.event.b_type == user_event.type and button.event.b_key == user_event.button:
                     if button.hightlight:
-                        print("action")
                         self.broadcast(button.id)
 
     def broadcast(self, id):
         self.s_event.append(ID_ACTION[id])
-        print(self.s_event)
+        #print(self.s_event)
 
 
     def render(self, screen, gap, shape):

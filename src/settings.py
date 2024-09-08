@@ -17,10 +17,29 @@ ID_ACTION = {
     3:"SettingsMenu"
 }
 
+
 def load_config(path):
     with open(path, "r") as f:
         return json.load(f)
 
+def quit():
+    pg.quit()
+    sys.exit()
+
 LAYOUT_INFO = load_config("layout.json")
 OPTIONS = load_config("settings.json")
+
+EVENT_ACTION = {
+        "PlayMenu": print,
+        "MusicMenu": print,
+        "SettingsMenu": print,
+        "Quit": quit
+}
+
+EVENT_ARG = {
+    "PlayMenu": "We are going to play",
+    "MusicMenu": "Chill",
+    "SettingsMenu": "no settings",
+    "Quit":None 
+}
 
