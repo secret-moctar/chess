@@ -1,13 +1,15 @@
-from src.settings import*
+from src.settings import *
 
 
 class ButtonEvent:
-    def __init__(self, b_type=pg.MOUSEBUTTONDOWN, b_key = 1):
+    def __init__(self, event_id, b_type=pg.MOUSEBUTTONDOWN, b_key=1):
+        self.event_id = event_id
         self.b_type = b_type
         self.b_key = b_key
 
+
 class Button:
-    def __init__(self, id, text, font, tcolor, bcolor, s_bcolor):
+    def __init__(self, id, text, font, tcolor, bcolor, s_bcolor, event):
         pg.init()
         self.id = id
         self.text = text
@@ -18,7 +20,7 @@ class Button:
         self.bcolor = bcolor
         self.s_bcolor = s_bcolor
         self.hightlight = False
-        self.event = ButtonEvent()
+        self.event = ButtonEvent(event)
 
     def draw(self):
         return self.font.render(self.text, True, self.tcolor)
@@ -31,11 +33,11 @@ class Button:
 
 
 class CompButton(Button):
-    def __init__(self, id, text, font, tcolor, bcolor, s_bcolor, tabs, paths):
+    def __init__(self, id, text, font, tcolor, bcolor, s_bcolor, tabs, paths, event):
         self.t_gap = 5
         self.tabs = tabs
         self.paths = paths
-        super().__init__(id, text, font, tcolor, bcolor, s_bcolor)
+        super().__init__(id, text, font, tcolor, bcolor, s_bcolor, event)
 
     def update(self, mos_pos):
         super().update(mos_pos)
@@ -43,7 +45,7 @@ class CompButton(Button):
     def load_imgs(self):
         imgs = []
         for path in self.paths:
-            if path in os.listdir(ICONDIR): 
+            if path in os.listdir(ICONDIR):
                 imgs.append(pg.transform.scale_by(pg.image.load(os.path.join(ICONDIR, path)).convert_alpha(), 0.5))
             else:
                 imgs.append(self.font.render(self.text, True, self.tcolor))
@@ -51,7 +53,7 @@ class CompButton(Button):
 
     def draw(self):
         self.imgs = self.load_imgs()
-        width, height = sum(map(lambda x:x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x:x.get_height()).get_height() + 2 * self.t_gap
+        width, height = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
         img = pg.Surface((width, height))
         img.fill((100, 100, 100))
         img.set_colorkey((100, 100, 100))
@@ -60,6 +62,7 @@ class CompButton(Button):
             img.blit(self.imgs[i], (x, y - self.imgs[i].get_height() // 2))
             x += self.imgs[i].get_width() + self.tabs[i + 1]
         return img
+
 
 class StackButton:
     def __init__(self, pos, tcolor, bcolor, s_bcolor):
@@ -82,27 +85,18 @@ class StackButton:
 
     def update(self, mos_pos):
         self.check_collide(mos_pos)
-        if self.s_event:
-            event = self.s_event.pop(0)
-            if EVENT_ARG[event]:
-                EVENT_ACTION[event](EVENT_ARG[event])
-            else:
-                EVENT_ACTION[event]()
 
     def check_collide(self, mos_pos):
         for button in self.stack:
             button.update(mos_pos)
 
-    def listen(self, user_event):
+    def listen(self, user_event, tag):
+        mon_event = []
         for button in self.stack:
-                if button.event.b_type == user_event.type and button.event.b_key == user_event.button:
-                    if button.hightlight:
-                        self.broadcast(button.id)
-
-    def broadcast(self, id):
-        self.s_event.append(ID_ACTION[id])
-        #print(self.s_event)
-
+            if button.event.b_type == user_event.type and button.event.b_key == user_event.button:
+                if button.hightlight:
+                    mon_event.append(button.event.event_id)
+        return mon_event
 
     def render(self, screen, gap, shape):
         acc = 0
