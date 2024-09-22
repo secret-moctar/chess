@@ -1,5 +1,5 @@
 from src.settings import *
-
+from src.resource_manager import res_manager
 
 class ButtonEvent:
     def __init__(self, event_id, b_type=pg.MOUSEBUTTONDOWN, b_key=1):
@@ -46,17 +46,26 @@ class CompButton(Button):
         imgs = []
         for path in self.paths:
             if path in os.listdir(ICONDIR):
-                imgs.append(pg.transform.scale_by(pg.image.load(os.path.join(ICONDIR, path)).convert_alpha(), 0.5))
+                imgs.append(pg.transform.scale_by(res_manager.get_pres(os.path.join("icons", path)).convert_alpha(), 0.8))
             else:
                 imgs.append(self.font.render(self.text, True, self.tcolor))
         return imgs
 
+    def render(self, screen, rel_pos):
+        self.imgs = self.load_imgs()
+        width, height = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
+        x, y = self.tabs[0], height // 2
+        for i in range(len(self.imgs)):
+            screen.blit(self.imgs[i], (rel_pos[0] + x,  rel_pos[1] + y - self.imgs[i].get_height() // 2))
+            x += self.imgs[i].get_width() + self.tabs[i + 1]
+
     def draw(self):
+        """Depecracated, but due to the principle of if it's works don't touch it i din't dorp it"""
         self.imgs = self.load_imgs()
         width, height = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
         img = pg.Surface((width, height))
-        img.fill((100, 100, 100))
-        img.set_colorkey((100, 100, 100))
+        #img.fill((1, 2, 3))
+        img.set_colorkey((0, 0, 0))
         x, y = self.tabs[0], height // 2
         for i in range(len(self.imgs)):
             img.blit(self.imgs[i], (x, y - self.imgs[i].get_height() // 2))
@@ -110,5 +119,8 @@ class StackButton:
 
             button.rect = button.img.get_rect(center=(self.pos[0], self.pos[1] + acc)).inflate(*inflame)
             pg.draw.rect(screen, bcolor, button.rect, border_radius=roundness)
-            screen.blit(button.img, (button.rect.centerx - button.img.get_width() // 2, button.rect.centery - button.img.get_height() // 2))
+            if isinstance(button, CompButton):
+                button.render(screen, (button.rect.centerx - button.img.get_width() // 2, button.rect.centery - button.img.get_height() // 2))
+            else:
+                screen.blit(button.img, (button.rect.centerx - button.img.get_width() // 2, button.rect.centery - button.img.get_height() // 2))
             acc += button.img.get_height() + gap

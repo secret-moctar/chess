@@ -3,6 +3,7 @@ import sys
 from src.settings import *
 from src.menu import WelcomeScreen
 from src.utils import log
+from src.config_manager import config
 
 
 class UiEngine:
@@ -26,16 +27,17 @@ class UiEngine:
         self.state = self.state.change()
 
     def render(self):
-        self.screen.fill(OPTIONS["theme"]["background"])
+        self.screen.fill(config.get_theme("background"))
         self.state.render(self.screen)
 
     def run(self):
         while True:
+            pg.display.set_caption(f"FPS: {self.clock.get_fps() // 1}")
             self.handle_events()
             self.update()
             self.render()
             pg.display.flip()
-            self.dt = self.clock.tick(60)
+            self.dt = self.clock.tick(40)
 
 
 if __name__ == "__main__":

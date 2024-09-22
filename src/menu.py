@@ -4,12 +4,13 @@ from src.state import State
 from src.settings import *
 from src.utils import parse
 from src.chess import ChessMenu
+from src.config_manager import config
 
 
 class WelcomeScreen(State):
     def __init__(self):
         super().__init__()
-        self.structure = parse(LAYOUT_INFO["Welcome"])
+        self.structure = parse(config.get_layout("Welcome"))
         self.s_time = pg.time.get_ticks() / 1000
         self.switch = False
 
@@ -40,7 +41,7 @@ class MainMenu(State):
     def __init__(self):
         super().__init__()
         self.tag = "MainMenu"
-        self.structure = parse(LAYOUT_INFO["MainMenu"])
+        self.structure = parse(config.get_layout("MainMenu"))
         self.transition_screen.input_img(pg.display.get_surface().copy())
         self.event = []
 
@@ -65,7 +66,7 @@ class MainMenu(State):
             pos = img["pos"]
             pos = WIN_WIDTH * pos[0] - img["img"].get_width() // 2, WIN_HEIGHT * pos[1] - img["img"].get_height() // 2
             screen.blit(img["img"], pos)
-        self.structure["stack"].render(screen, OPTIONS["button"]["gap"], OPTIONS["button"]["shape"])
+        self.structure["stack"].render(screen, config.get_setting("button", "gap"), config.get_setting("button", "shape"))
         self.transition_screen.render(screen)
 
 
@@ -73,7 +74,7 @@ class PlayMenu(State):
     def __init__(self):
         super().__init__()
         self.tag = "PlayMenu"
-        self.structure = parse(LAYOUT_INFO["PlayMenu"])
+        self.structure = parse(config.get_layout("PlayMenu"))
         self.transition_screen.input_img(pg.display.get_surface().copy())
         self.event = []
 
@@ -97,5 +98,5 @@ class PlayMenu(State):
             pos = img["pos"]
             pos = WIN_WIDTH * pos[0] - img["img"].get_width() // 2, WIN_HEIGHT * pos[1] - img["img"].get_height() // 2
             screen.blit(img["img"], pos)
-        self.structure["stack"].render(screen, OPTIONS["button"]["gap"], OPTIONS["button"]["shape"])
+        self.structure["stack"].render(screen, config.get_setting("button", "gap"), config.get_setting("button", "shape"))
         self.transition_screen.render(screen)

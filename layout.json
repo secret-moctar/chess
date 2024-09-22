@@ -36,9 +36,7 @@
     },
     "ChessMenu": {
         "imgs": {
-            "title": {"path": "chess_title.png", "pos": [0.08, 0.1], "scaleby": 1},
-            "clock1": {"path": "icons8-clock-48.png", "pos": [0.5, 0.05], "scaleby": 1},
-            "clock2": {"path": "icons8-clock-48.png", "pos": [0.5, 0.95], "scaleby": 1}
+            "title": {"path": "chess_title.png", "pos": [0.08, 0.1], "scaleby": 1}
         },
         "stack":{
             "pos":[0.08, 0.4],
