@@ -75,3 +75,23 @@ class ResourceManager:
         self._load_sound.cache_clear()
 
 res_manager = ResourceManager("data")  # resource manager
+
+# load some resources
+p_chess = "chess-pieces"
+p_join = os.path.join
+res_manager.register("K", p_join(p_chess, "Chess_klt60.png"))
+res_manager.register("k", p_join(p_chess, "Chess_kdt60.png"))
+res_manager.register("Q", p_join(p_chess, "Chess_qlt60.png"))
+res_manager.register("q", p_join(p_chess, "Chess_qdt60.png"))
+res_manager.register("B", p_join(p_chess, "Chess_blt60.png"))
+res_manager.register("b", p_join(p_chess, "Chess_bdt60.png"))
+res_manager.register("R", p_join(p_chess, "Chess_rlt60.png"))
+res_manager.register("r", p_join(p_chess, "Chess_rdt60.png"))
+res_manager.register("N", p_join(p_chess, "Chess_nlt60.png"))
+res_manager.register("n", p_join(p_chess, "Chess_ndt60.png"))
+res_manager.register("P", p_join(p_chess, "Chess_plt60.png"))
+res_manager.register("p", p_join(p_chess, "Chess_pdt60.png"))
+
+# load some image for marking
+res_manager.register("blue_circle", p_join("icons", "icons8-circle-30.png"))
+res_manager.register("red_circle", p_join("icons", "icons8-circle-48.png"))

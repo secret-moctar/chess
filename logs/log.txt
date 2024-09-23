@@ -1,10 +1,4 @@
 Start:
-<src.menu.WelcomeScreen object at 0x7f4687105520>
-<src.menu.MainMenu object at 0x7f4685713410>
-<src.menu.PlayMenu object at 0x7f468bc5ba40>
-<src.menu.MainMenu object at 0x7f468bb38800>
-<src.menu.PlayMenu object at 0x7f468bc50d70>
-<src.menu.MainMenu object at 0x7f4686ea9430>
-<src.menu.PlayMenu object at 0x7f4686b1a240>
-<src.menu.MainMenu object at 0x7f46857129c0>
-<src.menu.PlayMenu object at 0x7f4685712fc0>
+<src.menu.WelcomeScreen object at 0x7fac1a5cbfe0>
+<src.menu.MainMenu object at 0x7fac19440830>
+<src.menu.PlayMenu object at 0x7fac1a591400>
