@@ -53,6 +53,7 @@ class ChessMenu(State):
     def change(self):
         if not self.event: return self
         if self.event[0] == "Quit":
+            pg.time.delay(500)
             pg.quit()
             sys.exit()
         return self

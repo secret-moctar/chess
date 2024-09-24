@@ -3,6 +3,7 @@ import json
 
 import pygame as pg
 pg.init()
+pg.mixer.init()
 
 FONTDIR = os.path.join("data", "fonts")
 ICONDIR = os.path.join("data", "icons")

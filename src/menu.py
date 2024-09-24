@@ -57,6 +57,7 @@ class MainMenu(State):
         if self.event[0] == "PlayMenu":
             return self.call(PlayMenu)
         elif self.event[0] == "Quit":
+            pg.time.delay(500)
             pg.quit()
             sys.exit()
         return self

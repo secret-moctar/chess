@@ -95,3 +95,11 @@ res_manager.register("p", p_join(p_chess, "Chess_pdt60.png"))
 # load some image for marking
 res_manager.register("blue_circle", p_join("icons", "icons8-circle-30.png"))
 res_manager.register("red_circle", p_join("icons", "icons8-circle-48.png"))
+
+# register some sound
+res_manager.register("button", p_join("sounds", "button_click.mp3"))
+res_manager.register("move", p_join("sounds", "move-self.mp3"))
+res_manager.register("capture", p_join("sounds", "capture.mp3"))
+res_manager.register("check", p_join("sounds", "move-check.mp3"))
+res_manager.register("promote", p_join("sounds", "promote.mp3"))
+res_manager.register("check_mate", p_join("sounds", "notify.mp3"))

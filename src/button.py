@@ -104,6 +104,7 @@ class StackButton:
         for button in self.stack:
             if button.event.b_type == user_event.type and button.event.b_key == user_event.button:
                 if button.hightlight:
+                    res_manager.get_resource("button").play()
                     mon_event.append(button.event.event_id)
         return mon_event
 

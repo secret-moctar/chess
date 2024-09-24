@@ -1,3 +1,4 @@
+from src.pieces import Queen
 from src.board import Board
 from src.settings import *
 from src.resource_manager import res_manager
@@ -63,11 +64,14 @@ class ChessEng(ChessAbc):
     def is_checkmate(self, color):
         return self.is_king_checked(color) and self.zero_move(color)
 
-    def is_stalemate(self): return False
+    def is_stalemate(self, color):
+        return (not self.is_king_checked(color)) and self.zero_move(color)
 
     def handle_events(self, event):
         mos_pos = self.get_mos_pos()
         t_square = mos_pos[0] // SQUA + (mos_pos[1] // SQUA) * 8  # target square
+        if mos_pos[0] < 0 or mos_pos[1] < 0: t_square = -1
+        if mos_pos[0] > 8 * SQUA or mos_pos[1] > 8 * SQUA: t_square = -1
         piece = self.board.get_piece(t_square)
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -78,7 +82,6 @@ class ChessEng(ChessAbc):
                     for mv in current.all_legal_moves:
                         if mv.end == t_square:
                             self.make_move(mv)
-                            print(self.curr_player)
                     else: self.unselect()
 
     def cal_threat(self, color):
@@ -110,8 +113,7 @@ class ChessEng(ChessAbc):
 
     def select(self, t_square):
         self.selected = t_square
-        piece = self.board.get_piece(self.selected)
-        print(f"sq: {piece.all_legal_moves}")
+        res_manager.get_resource("move").play()
 
     def get_mos_pos(self):
         mos_pos = pg.mouse.get_pos()
@@ -120,6 +122,7 @@ class ChessEng(ChessAbc):
 
     def update(self, dt):
         if self.is_checkmate(self.curr_player):
+            res_manager.get_resource("check_mate").play()
             print("#"*40)
             if self.curr_player == WH: print("Black win")
             else: print("White wins")
@@ -149,17 +152,27 @@ class ChessEng(ChessAbc):
                 if self.is_move_valid(Move(me, m, self.is_cap(m))): hall.append(Move(me, m, self.is_cap(m)))
             else:
                 hall.append(Move(me, m, self.is_cap(m)))
-        #print(f"hall: {hall}")
         return hall
 
     def make_move(self, move, real=True):
+        if real:
+            if move.is_capture:
+                res_manager.get_resource("capture").play()
+            else:
+                res_manager.get_resource("move").play()
         self.board.move_piece(move.start, move.end)
         self.board.del_piece(move.start)
+        piece = self.board.get_piece(move.end)
+        if piece.fen.lower() == "p" and move.end // 8 in {0, 7}:
+            if real: res_manager.get_resource("promote").play()
+            self.board.in_board[move.end] = Queen("Q" if piece.get_type() == WH else "q")
         self.curr_player = WH if self.curr_player == BL else BL
         self.history.append(self.board.get_fnn(self.curr_player))
         self.update_mvt(real=real)
         self.cal_threat(WH)
         self.cal_threat(BL)
+        if self.is_king_checked(self.curr_player):
+            if real: res_manager.get_resource("check").play()
 
     def undo_move(self):
         last = self.history.pop()
