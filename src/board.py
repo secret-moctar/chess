@@ -7,7 +7,6 @@ from src.resource_manager import res_manager
 class Board():
     def __init__(self):
         self.in_board = [0] * 64
-        self.threat_map = set()
         self.hash_fnn = {
             "k": King,
             "q": Queen,
@@ -16,6 +15,58 @@ class Board():
             "r": Rook,
             "p": Pawn,
         }
+        self.lazers = self.shoot_lazer()
+
+    def copy_in(self):
+        in_board = [0] * 64
+        for i in range(64):
+            piece = self.get_piece(i)
+            if piece:
+                c_piece = self.hash_fnn[piece.fen.lower()](piece.fen)
+                c_piece.all_moves = piece.all_moves.copy()
+                c_piece.all_legal_moves =piece.all_legal_moves.copy()
+                c_piece.dirs = piece.dirs.copy()
+                in_board[i] = c_piece
+        return in_board
+
+    def copy(self):
+        other = Board()
+        other.in_board = self.copy_in()
+        other.hash_fnn = {
+            "k": King,
+            "q": Queen,
+            "n": Knight,
+            "b": Bishop,
+            "r": Rook,
+            "p": Pawn,
+        }
+        other.lazers = self.lazers.copy()
+
+        return other
+
+    def shoot_lazer(self):
+        lazers = []
+        for i in range(len(self.in_board)):
+            west = i % 8
+            east = 8 - west - 1
+            north = i // 8
+            south = 8 - north - 1
+            north_west = min(north, west)
+            south_west = min(south, west)
+            south_east = min(south, east)
+            north_east = min(north, east)
+            dir = {
+                -1: west,
+                1: east,
+                -8: north,
+                8: south,
+                -9: north_west,
+                7: south_west,
+                9: south_east,
+                -7: north_east
+            }
+            lazers.append(dir)
+        return lazers
 
     def move_piece(self, start, end):
         self.in_board[end] = self.in_board[start]
@@ -24,13 +75,13 @@ class Board():
         self.in_board[pos] = 0
 
     def load_fnn(self, squence):
-        board = self.in_board
+        self.in_board = [0] * 64
         file = 0
         rank = 0
         for char in squence.split()[0]:
             if char.lower() in self.hash_fnn:
                 target_square = rank * 8 + file
-                board[target_square] = self.hash_fnn[char.lower()](char)
+                self.in_board[target_square] = self.hash_fnn[char.lower()](char)
                 file += 1
             elif char == "/":
                 rank += 1
@@ -91,6 +142,11 @@ class Board():
         if s_pos[0] > SQUA * 8 - width: s_pos[0] = SQUA * 8 - width
         if s_pos[1] > SQUA * 8 - height: s_pos[1] = SQUA * 8 - height
         screen.blit(piece.img, (s_pos[0] - piece.img.get_width() // 2, s_pos[1] - piece.img.get_height() // 2))
+
+    def draw_pos(self, screen):
+        for i in range(64):
+            x, y = (i % 8) * SQUA, (i // 8) * SQUA
+            screen.blit(config.get_theme("font").render(f"{i}", True, config.get_theme("tcolor")), (x, y))
 
     def draw_pieces(self, screen, selected):
         for i in range(64):

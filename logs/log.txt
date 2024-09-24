@@ -1,4 +1,4 @@
 Start:
-<src.menu.WelcomeScreen object at 0x7fac1a5cbfe0>
-<src.menu.MainMenu object at 0x7fac19440830>
-<src.menu.PlayMenu object at 0x7fac1a591400>
+<src.menu.WelcomeScreen object at 0x7fc1881fbb90>
+<src.menu.MainMenu object at 0x7fc187f3dd30>
+<src.menu.PlayMenu object at 0x7fc187f6e6c0>
