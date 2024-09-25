@@ -73,6 +73,9 @@ class ChessEng(ChessAbc):
         if mos_pos[0] < 0 or mos_pos[1] < 0: t_square = -1
         if mos_pos[0] > 8 * SQUA or mos_pos[1] > 8 * SQUA: t_square = -1
         piece = self.board.get_piece(t_square)
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_SPACE:
+                print(f"command:{self.board.get_fnn(self.curr_player)}")
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
                 if self.selected == -1 and piece and self.is_my_turn(piece):
@@ -82,7 +85,8 @@ class ChessEng(ChessAbc):
                     for mv in current.all_legal_moves:
                         if mv.end == t_square:
                             self.make_move(mv)
-                    else: self.unselect()
+                            break
+                    self.unselect()
 
     def cal_threat(self, color):
         threat = self.w_threat if color == WH else self.b_threat
@@ -90,7 +94,7 @@ class ChessEng(ChessAbc):
             threat[i] = 0
         for i in range(64):
             piece = self.board.get_piece(i)
-            if piece and piece.get_type() == color : piece.apply_threat(threat)
+            if piece and piece.get_type() == color : piece.apply_threat(threat, i)
 
     def is_square_under_attack(self, square, attacking_color):
         threat = self.w_threat if attacking_color == WH else self.b_threat
@@ -121,12 +125,19 @@ class ChessEng(ChessAbc):
         return mos_pos
 
     def update(self, dt):
+        return
         if self.is_checkmate(self.curr_player):
             res_manager.get_resource("check_mate").play()
             print("#"*40)
             if self.curr_player == WH: print("Black win")
             else: print("White wins")
             print("#"*40)
+        if self.is_stalemate(self.curr_player):
+            res_manager.get_resource("check_mate").play()
+            print("#"*40)
+            print("DRAW, DRAW DRAW")
+            print("#"*40)
+
 
     def is_move_valid(self, move):
         color = self.curr_player
@@ -139,6 +150,24 @@ class ChessEng(ChessAbc):
         curr = self.board.get_piece(me)
         for m in moves:
             peice = self.board.get_piece(m)
+
+            #add castling
+            if curr and curr.fen.lower() == "k" and real:
+                if curr.castling[0]:
+                    do_it = True
+                    for s in range(1, 4):
+                        ct_s =  me - s  # castling target square
+                        if self.board.get_piece(ct_s): do_it = False
+                    if do_it:
+                        if self.is_move_valid(Move(me, me - 2, False)): hall.append(Move(me, me - 2, False))
+                if curr.castling[1]:
+                    do_it = True
+                    for s in range(1, 3):
+                        ct_s =  me + s  # castling target square
+                        if self.board.get_piece(ct_s): do_it = False
+                    if do_it:
+                        if self.is_move_valid(Move(me, me + 2, False)): hall.append(Move(me, me + 2, False))
+
             if curr.fen.lower() == "p":
                 if m % 8 == me % 8:
                     if peice: continue
@@ -155,22 +184,52 @@ class ChessEng(ChessAbc):
         return hall
 
     def make_move(self, move, real=True):
+        # getting the piece before making the move
+        piece = self.board.get_piece(move.start)
+        # playing the sound
         if real:
             if move.is_capture:
                 res_manager.get_resource("capture").play()
             else:
                 res_manager.get_resource("move").play()
+        # actually making the move on the board
         self.board.move_piece(move.start, move.end)
         self.board.del_piece(move.start)
-        piece = self.board.get_piece(move.end)
-        if piece.fen.lower() == "p" and move.end // 8 in {0, 7}:
+
+        # checking if rook as moved and ihabinting the castling on that side
+        if real and piece and piece.fen.lower() == "r":
+            mon_king = self.board.get_piece(self.find_king(piece.get_type()))
+            if move.start % 8 == 0:
+                mon_king.castling[0] = False
+            elif move.start % 8 == 7:
+                mon_king.castling[1] = False
+
+        # checking if the move is castling and moving the rook aproparietly
+        if real and piece and piece.fen.lower() == "k":
+            if abs(move.start - move.end) == 2:
+                rook_pos = (move.start // 8) * 8 if move.end % 8 == 2 else (move.start // 8) * 8 + 7
+                end_pos = move.start - 1 if move.end % 8 == 2 else move.start + 1
+                rook = self.board.get_piece(rook_pos)
+                if rook:
+                    self.board.move_piece(rook_pos, end_pos)
+                    self.board.del_piece(rook_pos)
+                    piece.castling = [False, False]
+            else:
+                # if the move is not castling the king loses all right to future castling
+                piece.castling = [False, False]
+
+        # checking for promotion
+        if piece and piece.fen.lower() == "p" and move.end // 8 in {0, 7}:
             if real: res_manager.get_resource("promote").play()
             self.board.in_board[move.end] = Queen("Q" if piece.get_type() == WH else "q")
+
+        # chaging the current palyer and updating the history and the possible mvt and threat for every piece
         self.curr_player = WH if self.curr_player == BL else BL
         self.history.append(self.board.get_fnn(self.curr_player))
         self.update_mvt(real=real)
         self.cal_threat(WH)
         self.cal_threat(BL)
+        # checking if the move made the king in danger and playing the sound
         if self.is_king_checked(self.curr_player):
             if real: res_manager.get_resource("check").play()
 

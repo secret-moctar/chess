@@ -26,6 +26,7 @@ class Board():
                 c_piece.all_moves = piece.all_moves.copy()
                 c_piece.all_legal_moves =piece.all_legal_moves.copy()
                 c_piece.dirs = piece.dirs.copy()
+                if c_piece.fen.lower() == "k": c_piece.castling = piece.castling.copy()
                 in_board[i] = c_piece
         return in_board
 
@@ -112,6 +113,7 @@ class Board():
                     fen += "/"
                     empty = 0
                 empty += 1
+        if empty: fen += f"{empty}"
         fen += f" {curr_player[0].lower()}"
         return fen
 

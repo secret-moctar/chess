@@ -10,7 +10,7 @@ class Piece:
         self.all_legal_moves = []
         self.dirs = {}
 
-    def apply_threat(self, threat):
+    def apply_threat(self, threat, pos):
         for sqaure in self.all_moves:
             threat[sqaure] += 1
 
@@ -52,6 +52,7 @@ class King(Slider):
     def __init__(self, fen):
         super().__init__(fen)
         self.dirs = {-1, 1, -8, 8, -7, 7, -9, 9}
+        self.castling = [True, True]
 
     def get_moves(self, board, pos):
         return super().get_moves(board, pos)
@@ -117,3 +118,8 @@ class Pawn(Piece):
             if (t_x - me_x) ** 2 + (t_y - me_y) ** 2 > 4: continue
             all_moves.append(t_square)
         return all_moves
+
+    def apply_threat(self, threat, pos):
+        for sqaure in self.all_moves:
+            if sqaure % 8 == pos % 8: continue
+            threat[sqaure] += 1

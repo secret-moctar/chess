@@ -4,11 +4,13 @@ from src.settings import *
 from src.menu import WelcomeScreen
 from src.utils import log
 from src.config_manager import config
+from src.resource_manager import res_manager
 
 
 class UiEngine:
     def __init__(self):
         self.screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+        pg.display.set_icon(res_manager.get_resource("chess_title"))
         self.clock = pg.time.Clock()
         self.state = WelcomeScreen()
         self.dt = 0
