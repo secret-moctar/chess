@@ -17,7 +17,8 @@ class ConfigManager:
     def initialize_theme(self):
         fontdir = os.path.join("data", "fonts")
         return {
-            "font": pg.font.Font(f"{fontdir}/{self.settings["font"]}.ttf", self.settings["font_size"]),
+            "font": pg.font.Font(os.path.join(fontdir, f"{self.settings["font"]}.ttf"), self.settings["font_size"]),
+            "small_font": pg.font.Font(None, 18),
             "background": self.settings["theme"]["background"],
             "tcolor": self.settings["button"]["text"],
             "bcolor": self.settings["button"]["background"],

@@ -11,7 +11,7 @@ ICONDIR = os.path.join("data", "icons")
 WIN_WIDTH = 900
 WIN_HEIGHT = 700
 
-WH = "w"
+WH = "W"
 BL = "B"
 
 SQUA = 60

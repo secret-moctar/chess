@@ -2,6 +2,7 @@ from src.settings import*
 from src.pieces import King, Piece, Queen, Knight, Rook, Bishop, Pawn
 from src.config_manager import config
 from src.resource_manager import res_manager
+from src.moves import Move
 
 
 class Board():
@@ -75,6 +76,14 @@ class Board():
     def del_piece(self, pos):
         self.in_board[pos] = 0
 
+    def str_to_pos(self, string_pos):
+        y = 8 - int(string_pos[1])
+        x = ord(string_pos[0]) - ord('a')
+        return y * 8 + x
+
+    def pos_to_str(self, pos):
+        return chr(ord('a') + pos % 8) + str(8 - pos // 8)
+
     def load_fnn(self, squence):
         self.in_board = [0] * 64
         file = 0
@@ -90,9 +99,20 @@ class Board():
             else:
                 num = int(char)
                 file += num
-        return squence.split()[1]
+        castling = squence.split()[2]
+        c_w = ["Q" in castling, "K" in castling]
+        c_b = ["q" in castling, "k" in castling]
+        last_move = None
+        if squence.split()[3] == "-":
+            last_move = None
+        else:
+            pos = self.str_to_pos(squence.split()[3])
+            if pos // 8 == 2: last_move = Move(pos - 8, pos + 8, False)
+            if pos // 8 == 5: last_move = Move(pos + 8, pos - 8, False)
+        half_clock, full_clock = int(squence.split()[4]), int(squence.split()[5])
+        return squence.split()[1].upper(), c_w, c_b, last_move, half_clock, full_clock
 
-    def get_fnn(self, curr_player):
+    def get_fnn(self, curr_player, w_k, b_k, move, half_clock, full_clock):
         fen = ""
         empty = 0
         for square in range(len(self.in_board)):
@@ -114,7 +134,26 @@ class Board():
                     empty = 0
                 empty += 1
         if empty: fen += f"{empty}"
-        fen += f" {curr_player[0].lower()}"
+        fen += f" {curr_player[0]}"
+        c_state = ""
+        if w_k.castling[0]: c_state += "Q"
+        if w_k.castling[1]: c_state += "K"
+        if b_k.castling[0]: c_state += "q"
+        if b_k.castling[1]: c_state += "k"
+
+        if c_state: fen += f" {c_state}"
+        else: fen += " -"
+
+        if move and move.end % 8 == move.start % 8:
+            if move.end > move.start:
+                fen += f" {self.pos_to_str(move.end - 8)}"
+            else:
+                fen += f" {self.pos_to_str(move.end + 8)}"
+        else:
+            fen += " -"
+
+        fen += f" {half_clock}"
+        fen += f" {full_clock}"
         return fen
 
     def get_piece(self, position):
@@ -157,3 +196,10 @@ class Board():
             if i == selected: continue
             x, y = (i % 8) * SQUA, (i // 8) * SQUA
             screen.blit(piece.img, (x, y))
+
+    def draw_labels(self, screen):
+        for i in range(8):
+            letter = config.get_theme("small_font").render(chr(ord('a') + i), True, (0, 0, 255))
+            screen.blit(letter, (SQUA * (i + 1) - letter.get_width(), SQUA * 8 - letter.get_height()))
+            number = config.get_theme("small_font").render(f"{i + 1}", True, (0, 0, 255))
+            screen.blit(number, (0, SQUA * (7 - i)))
