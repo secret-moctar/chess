@@ -21,9 +21,9 @@ class ChessEng(ChessAbc):
         self.half_clock = 0
         self.full_clock = 0
         self.last_move = None
-        self.load_fnn("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk - 0 0")
+        if org: self.load_fnn("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w QKqk - 0 0")
         self.first_to_move = self.curr_player
-        self.history = [self.get_fnn()]
+        if org: self.history = [self.get_fnn()]
         if org:
             self.update_mvt()
             self.update_threat(WH)
@@ -31,14 +31,16 @@ class ChessEng(ChessAbc):
 
     def get_fnn(self):
         w_k = self.board.get_piece(self.find_king(WH))
-        b_k = self.board.get_piece(self.find_king(WH))
+        b_k = self.board.get_piece(self.find_king(BL))
         return self.board.get_fnn(self.curr_player, w_k, b_k, self.last_move, self.half_clock, self.full_clock)
 
     def load_fnn(self, squence):
-        turn, c_w, c_b, last_move, hc, fc = self.board.load_fnn(squence)
+        turn, c_w, c_b, last_move, hc, fc = self.board.load_fnn(squence, debug=True)
         self.curr_player =  turn
         w_k = self.board.get_piece(self.find_king(WH))
-        b_k = self.board.get_piece(self.find_king(WH))
+        b_k = self.board.get_piece(self.find_king(BL))
+        print(f"undo_cw: {c_w}")
+        print(f"undo_cb: {c_b}")
         w_k.castling = c_w
         b_k.castling = c_b
         self.last_move = last_move
@@ -126,6 +128,10 @@ class ChessEng(ChessAbc):
                 print(f"command:{self.get_fnn()}")
                 if self.last_move: print(f"last move: {self.last_move.start} -> {self.last_move.end}")
                 print(f"time: {pg.time.get_ticks()}")
+                w_k = self.board.get_piece(self.find_king(WH))
+                w_b = self.board.get_piece(self.find_king(BL))
+                print(f"cas_w:{w_k.castling}")
+                print(f"cas_b:{w_b.castling}")
             if event.key == pg.K_BACKSPACE: self.undo_move()
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -199,7 +205,7 @@ class ChessEng(ChessAbc):
                     if self.is_move_valid(Move(me, me + 2, False)): hall.append(Move(me, me + 2, False))
 
     def handle_en_passant(self, me, curr, hall):
-        if curr.fen.lower() and self.last_move and abs(self.last_move.start - self.last_move.end) == 16:  # Two-square pawn move
+        if curr.fen.lower() == "p" and self.last_move and abs(self.last_move.start - self.last_move.end) == 16:  # Two-square pawn move
             if curr.get_type() == WH and me // 8 == 3:  # White pawn on 5th rank
                 if me % 8 != 0 and self.last_move.end == me - 1:  # Left side
                     if self.is_move_valid(Move(me, me - 9, True)): hall.append(Move(me, me - 9, True))
@@ -331,14 +337,14 @@ class ChessEng(ChessAbc):
         if real:
             if self.last_move: print(f"last: {self.last_move.start} -> {self.last_move.end} ")
             else: print("last: None")
-            print(f"hist: {self.get_fnn()}")
+            print(f"hist: {self.history[-1]}")
 
     def undo_move(self):
         if len(self.history) > 1: last = self.history.pop()
         else: return ""
         res_manager.get_resource("move").play()
         self.load_fnn(self.history[-1])
-        self.update_mvt(debug=False)
+        self.update_mvt(debug=False, real=False)
         self.update_threat(WH)
         self.update_threat(BL)
         return last

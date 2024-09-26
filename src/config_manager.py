@@ -6,8 +6,8 @@ from src.settings import *
 
 class ConfigManager:
     def __init__(self):
-        self.layouts = self.load_json("layout.json")
-        self.settings = self.load_json("settings.json")
+        self.layouts = self.load_json(os.path.join("setup", "layout.json"))
+        self.settings = self.load_json(os.path.join("setup", "settings.json"))
         self.theme = self.initialize_theme()
 
     def load_json(self, filename):

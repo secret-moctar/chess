@@ -1,10 +1,11 @@
 import sys
 
 from src.settings import *
-from src.menu import WelcomeScreen
 from src.utils import log
 from src.config_manager import config
 from src.resource_manager import res_manager
+from src.state_manager import state_manager
+import src.loader
 
 
 class UiEngine:
@@ -12,7 +13,7 @@ class UiEngine:
         self.screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         pg.display.set_icon(res_manager.get_resource("chess_title"))
         self.clock = pg.time.Clock()
-        self.state = WelcomeScreen()
+        state_manager.change_state("WelcomeScreen")
         self.dt = 0
         log("Start:", "w")
 
@@ -21,16 +22,15 @@ class UiEngine:
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-            self.state.handle_events(event)
+            state_manager.current_state.handle_events(event)
 
     def update(self):
         mos_pos = pg.mouse.get_pos()
-        self.state.update(mos_pos, self.dt)
-        self.state = self.state.change()
+        state_manager.current_state.update(mos_pos, self.dt)
 
     def render(self):
         self.screen.fill(config.get_theme("background"))
-        self.state.render(self.screen)
+        state_manager.current_state.render(self.screen)
 
     def run(self):
         while True:
@@ -39,7 +39,7 @@ class UiEngine:
             self.update()
             self.render()
             pg.display.flip()
-            self.dt = self.clock.tick(40)
+            self.dt = self.clock.tick(FPS) / 1000 # to seconds
 
 
 if __name__ == "__main__":

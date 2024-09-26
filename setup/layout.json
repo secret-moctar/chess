@@ -1,0 +1,158 @@
+{
+  "Welcome": {
+    "imgs": {
+      "header": {
+        "path": "chess_title_entry.png",
+        "pos": [0.5, 0.5],
+        "scaleby": 1
+      }
+    }
+  },
+  "MainMenu": {
+    "imgs": {
+      "header": { "path": "chess_title.png", "pos": [0.5, 0.2] },
+      "info": { "path": "icons8-github-64.png", "pos": [0.95, 0.95] }
+    },
+    "stacks": {
+      "0": {
+        "pos": [0.5, 0.4],
+        "buttons": {
+          "Play": {
+            "id": 1,
+            "type": "complex",
+            "tabs": [0, 15, 15, 0],
+            "paths": ["icons8-battle-48.png", "Play", "icons8-battle-48.png"],
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "PlayMenu"
+          },
+          "music": {
+            "id": 2,
+            "type": "complex",
+            "tabs": [0, 15, 15, 0],
+            "paths": [
+              "icons8-musical-note-50.png",
+              "music",
+              "icons8-musical-note-50.png"
+            ],
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "MusicMenu"
+          },
+          "settings": {
+            "id": 3,
+            "type": "complex",
+            "tabs": [0, 15, 15, 0],
+            "paths": [
+              "icons8-settings-40.png",
+              "music",
+              "icons8-settings-40.png"
+            ],
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "SettingsMenu"
+          },
+          "Quit": {
+            "id": 0,
+            "type": "simple",
+            "bcolor": "#FF8888",
+            "s_bcolor": "#FF0000",
+            "event": "Quit"
+          }
+        }
+      }
+    }
+  },
+  "PlayMenu": {
+    "imgs": {
+      "header": { "path": "chess_title.png", "pos": [0.5, 0.2] },
+      "info": { "path": "icons8-github-64.png", "pos": [0.95, 0.95] }
+    },
+    "stacks": {
+      "0": {
+        "pos": [0.5, 0.4],
+        "buttons": {
+          "Hum_vs_Hum": {
+            "id": 1,
+            "type": "complex",
+            "tabs": [0, 15, 15, 0],
+            "paths": [
+              "icons8-human-head-48.png",
+              "icons8-battle-48.png",
+              "icons8-human-head-48.png"
+            ],
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "Hum_vs_Hum"
+          },
+          "Hum_vs_ROB": {
+            "id": 2,
+            "type": "complex",
+            "tabs": [0, 15, 15, 0],
+            "paths": [
+              "icons8-human-head-48.png",
+              "icons8-battle-48.png",
+              "icons8-music-robot-48.png"
+            ],
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "Hum_vs_Rob"
+          },
+          "Timer": {
+            "id": 3,
+            "type": "simple",
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "TimerMenu"
+          },
+          "Back": {
+            "id": 0,
+            "type": "simple",
+            "bcolor": "#FF8888",
+            "s_bcolor": "#FF0000",
+            "event": "Back"
+          }
+        }
+      }
+    }
+  },
+  "ChessMenu": {
+    "imgs": {
+      "title": { "path": "chess_title.png", "pos": [0.08, 0.1], "scaleby": 1 }
+    },
+    "stacks": {
+      "0": {
+        "pos": [0.08, 0.4],
+        "buttons": {
+          "Pause": {
+            "id": 1,
+            "type": "simple",
+            "bcolor": "theme",
+            "s_bcolor": "theme",
+            "event": "Pause"
+          },
+          "Back": {
+            "id": 0,
+            "type": "simple",
+            "bcolor": "#FF8888",
+            "s_bcolor": "#FF0000",
+            "event": "Back"
+          }
+        }
+      },
+
+      "1": {
+        "pos": [0.9, 0.5],
+        "buttons": {
+          "Quit": {
+            "id": 0,
+            "type": "simple",
+            "bcolor": "#FF8888",
+            "s_bcolor": "#FF0000",
+            "event": "Quit"
+          }
+        }
+      }
+    }
+  }
+}

@@ -84,7 +84,7 @@ class Board():
     def pos_to_str(self, pos):
         return chr(ord('a') + pos % 8) + str(8 - pos // 8)
 
-    def load_fnn(self, squence):
+    def load_fnn(self, squence, debug=False):
         self.in_board = [0] * 64
         file = 0
         rank = 0
@@ -102,6 +102,9 @@ class Board():
         castling = squence.split()[2]
         c_w = ["Q" in castling, "K" in castling]
         c_b = ["q" in castling, "k" in castling]
+        print(f"c_w: {c_w}")
+        print(f"c_b: {c_b}")
+        print(castling)
         last_move = None
         if squence.split()[3] == "-":
             last_move = None
@@ -112,7 +115,7 @@ class Board():
         half_clock, full_clock = int(squence.split()[4]), int(squence.split()[5])
         return squence.split()[1].upper(), c_w, c_b, last_move, half_clock, full_clock
 
-    def get_fnn(self, curr_player, w_k, b_k, move, half_clock, full_clock):
+    def get_fnn(self, curr_player, w_k, b_k, move, half_clock, full_clock, debug=False):
         fen = ""
         empty = 0
         for square in range(len(self.in_board)):
@@ -141,6 +144,7 @@ class Board():
         if b_k.castling[0]: c_state += "q"
         if b_k.castling[1]: c_state += "k"
 
+        print(f"c_state: {c_state}")
         if c_state: fen += f" {c_state}"
         else: fen += " -"
 
