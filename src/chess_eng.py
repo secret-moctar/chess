@@ -9,9 +9,11 @@ from src.chess_abc import ChessAbc
 
 
 class ChessEng(ChessAbc):
-    def __init__(self, rel_pos, org=True):
-        self.curr_player = None
+    def __init__(self, rel_pos, w_clock, b_clock, org=True):
         self.rel_pos = rel_pos
+        self.w_clock = w_clock
+        self.b_clock = b_clock
+        self.curr_player = None
         self.board = Board()
         self.selected = -1
         self.w_threat = {i: 0 for i in range(64)}
@@ -44,7 +46,7 @@ class ChessEng(ChessAbc):
         self.full_clock = fc
 
     def copy(self):
-        other = ChessEng(self.rel_pos, org=False)
+        other = ChessEng(self.rel_pos, self.w_clock, self.b_clock, org=False)
         other.curr_player = self.curr_player
         other.rel_pos = self.rel_pos
         other.board = self.board.copy()
@@ -122,7 +124,8 @@ class ChessEng(ChessAbc):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
                 print(f"command:{self.get_fnn()}")
-                print(f"last move: {self.last_move.start} -> {self.last_move.end}")
+                if self.last_move: print(f"last move: {self.last_move.start} -> {self.last_move.end}")
+                print(f"time: {pg.time.get_ticks()}")
             if event.key == pg.K_BACKSPACE: self.undo_move()
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -137,7 +140,6 @@ class ChessEng(ChessAbc):
                     self.unselect()
 
     def update(self, dt):
-        return
         if self.is_checkmate(self.curr_player):
             res_manager.get_resource("check_mate").play()
             print("#"*40)
@@ -153,6 +155,15 @@ class ChessEng(ChessAbc):
             print("##################")
             print("CAN DRAW")
             print("##################")
+        if self.w_clock.over():
+            print("#"*40)
+            print("Black wins")
+            print("#"*40)
+        if self.b_clock.over():
+            print("#"*40)
+            print("White wins")
+            print("#"*40)
+
 
     def is_move_valid(self, move):
         color = self.curr_player
@@ -306,6 +317,14 @@ class ChessEng(ChessAbc):
 
         if real and piece and piece.get_type() != self.first_to_move:
             self.full_clock += 1
+
+        # updating the state of the real clocks
+        if real and piece.get_type() == WH:
+            self.w_clock.off()
+            self.b_clock.on()
+        elif real:
+            self.b_clock.off()
+            self.w_clock.on()
 
         # updating the history with this last move
         if real: self.history.append(self.get_fnn())

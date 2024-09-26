@@ -3,6 +3,9 @@ from abc import ABC, abstractmethod
 
 class ChessAbc(ABC):
     @abstractmethod
+    def __init__(self, rel_pos, w_clock, b_clock, org=True): ...
+
+    @abstractmethod
     def make_move(self, move, real=True): ...
 
     @abstractmethod
