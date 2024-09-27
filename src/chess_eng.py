@@ -1,10 +1,9 @@
 from src.settings import *
-from src.resource_manager import res_manager
 from src.config_manager import config
 from src.pieces import Queen, Rook, Knight, Bishop
 from src.board import Board
-from src.utils import log
 from src.moves import Move
+from src.resource_manager import res_manager
 from src.chess_abc import ChessAbc
 
 

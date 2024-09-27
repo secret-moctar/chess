@@ -5,7 +5,7 @@ from src.utils import log
 from src.config_manager import config
 from src.resource_manager import res_manager
 from src.state_manager import state_manager
-import src.loader
+import src.loader  # this is important don't delete it imtalking to the future me
 
 
 class UiEngine:
