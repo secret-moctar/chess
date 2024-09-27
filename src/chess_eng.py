@@ -20,7 +20,7 @@ class ChessEng(ChessAbc):
         self.half_clock = 0
         self.full_clock = 0
         self.last_move = None
-        if org: self.load_fnn("rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w QKqk - 0 0")
+        if org: self.load_fnn("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk - 0 0")
         self.first_to_move = self.curr_player
         if org: self.history = [self.get_fnn()]
         if org:
