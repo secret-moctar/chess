@@ -1,6 +1,7 @@
 from src.settings import *
 from src.resource_manager import res_manager
 
+
 class ButtonEvent:
     def __init__(self, event_id, b_type=pg.MOUSEBUTTONDOWN, b_key=1):
         self.event_id = event_id
@@ -16,7 +17,7 @@ class Button:
         self.font = font
         self.tcolor = tcolor
         self.img = self.draw()
-        self.rect = self.img.get_rect(topleft=(0, 0)).inflate(30, 10)
+        self.rect = self.img.get_rect(topleft=(0, 0)).inflate(30, 10)  # need to add these values to config
         self.bcolor = bcolor
         self.s_bcolor = s_bcolor
         self.hightlight = False
@@ -35,9 +36,10 @@ class Button:
 class CompButton(Button):
     def __init__(self, id, text, font, tcolor, bcolor, s_bcolor, tabs, paths, event):
         self.t_gap = 5
-        self.tabs = tabs
-        self.paths = paths
+        self.tabs = tabs  # list containing the space between two images on the button
+        self.paths = paths  # list of paths to the image in the button
         super().__init__(id, text, font, tcolor, bcolor, s_bcolor, event)
+        # self.imgs = self.load_imgs()
 
     def update(self, mos_pos):
         super().update(mos_pos)
@@ -46,25 +48,29 @@ class CompButton(Button):
         imgs = []
         for path in self.paths:
             if path in os.listdir(ICONDIR):
-                imgs.append(pg.transform.scale_by(res_manager.get_pres(os.path.join("icons", path)).convert_alpha(), 0.8))
+                # im not scaling them by the way but if i need to i will figure some way to do it.
+                imgs.append(pg.transform.scale_by(res_manager.get_pres(os.path.join("icons", path)).convert_alpha(), 1))
             else:
                 imgs.append(self.font.render(self.text, True, self.tcolor))
         return imgs
 
     def render(self, screen, rel_pos):
-        self.imgs = self.load_imgs()
-        width, height = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
+        width = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs)
+        height = max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
         x, y = self.tabs[0], height // 2
         for i in range(len(self.imgs)):
-            screen.blit(self.imgs[i], (rel_pos[0] + x,  rel_pos[1] + y - self.imgs[i].get_height() // 2))
+            screen.blit(self.imgs[i], (rel_pos[0] + x, rel_pos[1] + y - self.imgs[i].get_height() // 2))
             x += self.imgs[i].get_width() + self.tabs[i + 1]
 
     def draw(self):
-        """Depecracated, but due to the principle of if it's works don't touch it i din't dorp it"""
         self.imgs = self.load_imgs()
+        """Depecracated, but due to the principle of if it's works don't touch it i din't dorp it
+            it is nessary cause in the parent class(Button) we use this function to get the rect and after that
+            use rect.inflate(x, y) to have thes beautifull outline
+        """
         width, height = sum(map(lambda x: x.get_width(), self.imgs)) + sum(self.tabs), max(self.imgs, key=lambda x: x.get_height()).get_height() + 2 * self.t_gap
         img = pg.Surface((width, height))
-        #img.fill((1, 2, 3))
+        # img.fill((1, 2, 3))
         img.set_colorkey((0, 0, 0))
         x, y = self.tabs[0], height // 2
         for i in range(len(self.imgs)):
@@ -83,19 +89,19 @@ class StackButton:
         self.s_event = []
 
     def moveby(self, x, y):
+        """This will come handy when we start to implement pop up screen and stuff that dynamicaly get called"""
         self.pos[0] += x
         self.pos[1] += y
 
     def moveto(self, x, y):
+        """the same goes for this one also"""
         self.pos = [x, y]
 
     def push(self, button):
+        """push any thing that follow the listen, update, also and render structure if you support these three function you can be added to the stack no problem"""
         self.stack.append(button)
 
     def update(self, mos_pos):
-        self.check_collide(mos_pos)
-
-    def check_collide(self, mos_pos):
         for button in self.stack:
             button.update(mos_pos)
 

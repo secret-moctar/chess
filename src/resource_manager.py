@@ -3,6 +3,7 @@ from functools import lru_cache
 
 from src.settings import *
 
+
 class ResourceManager:
     def __init__(self, base_path):
         self.base_path = base_path

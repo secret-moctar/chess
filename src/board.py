@@ -6,8 +6,9 @@ from src.moves import Move
 
 
 class Board():
-    def __init__(self):
+    def __init__(self, rel_pos):
         self.in_board = [0] * 64
+        self.rel_pos = rel_pos
         self.hash_fnn = {
             "k": King,
             "q": Queen,
@@ -32,7 +33,7 @@ class Board():
         return in_board
 
     def copy(self):
-        other = Board()
+        other = Board(self.rel_pos)
         other.in_board = self.copy_in()
         other.hash_fnn = {
             "k": King,
@@ -160,6 +161,20 @@ class Board():
         fen += f" {full_clock}"
         return fen
 
+    def get_rel_mos_pos(self):
+        mos_pos = pg.mouse.get_pos()
+        mos_pos = [mos_pos[0] - self.rel_pos[0], mos_pos[1] - self.rel_pos[1]]
+        for i in range(2):
+            if mos_pos[i] < 0:
+                mos_pos[i] = 0
+            if mos_pos[i] > 8 * SQUA:
+                mos_pos[i] = 8 * SQUA - 1
+        return mos_pos
+
+    def get_square_from_pos(self, pos):
+        square = (pos[0] // SQUA) + (pos[1] // SQUA) * 8
+        if not 0 <= square <= 63: return -1
+        return square
     def get_piece(self, position):
         return self.in_board[position] if 0 <= position <= 63 else 0
 
@@ -178,8 +193,9 @@ class Board():
             else:
                 screen.blit(res_manager.get_resource("blue_circle"), (x + SQUA // 2 - 15, y + SQUA // 2 - 15))
 
-    def draw_selected(self, screen, piece, pos):
-        s_pos = list(pos)
+    def draw_selected(self, screen, selected_pos):
+        piece = self.get_piece(selected_pos)
+        s_pos = self.get_rel_mos_pos()
         width = piece.img.get_width() // 2
         height = piece.img.get_height() // 2
         if s_pos[0] < width: s_pos[0] = width

@@ -58,4 +58,5 @@ class MainMenu(State):
         else:
             self.transition_screen.render(screen)
 
+
 state_manager.register("MainMenu", MainMenu)

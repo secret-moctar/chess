@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.settings import *
 
+
 class BlendABC(ABC):
     @abstractmethod
     def update(self, dt): ...

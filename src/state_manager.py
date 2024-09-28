@@ -16,4 +16,5 @@ class StateManager:
         del self.current_state
         self.current_state = self.get_state(state_id)()
 
+
 state_manager = StateManager()

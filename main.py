@@ -39,7 +39,7 @@ class UiEngine:
             self.update()
             self.render()
             pg.display.flip()
-            self.dt = self.clock.tick(FPS) / 1000 # to seconds
+            self.dt = self.clock.tick(FPS) / 1000  # to seconds
 
 
 if __name__ == "__main__":
