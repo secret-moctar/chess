@@ -6,6 +6,7 @@ from src.config_manager import config
 from src.resource_manager import res_manager
 from src.state_manager import state_manager
 import src.loader  # this is important don't delete it imtalking to the future me
+from src.eventer import event_queue, event_dispatcher, EventType, GameEvent
 
 
 class UiEngine:
@@ -15,6 +16,7 @@ class UiEngine:
         self.clock = pg.time.Clock()
         state_manager.change_state("WelcomeScreen")
         self.dt = 0
+        event_dispatcher.register(EventType.QuitGame, self.quit)
         log("Start:", "w")
 
     def handle_events(self):
@@ -22,10 +24,38 @@ class UiEngine:
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                event_queue.push(GameEvent(EventType.MouseDown, "PYGAME", data={"pos":event.pos, "button": event.button}))
+            if event.type == pg.MOUSEBUTTONUP:
+                event_queue.push(GameEvent(EventType.MouseUp, "PYGAME", data={"pos":event.pos, "button": event.button}))
+            if event.type == pg.KEYDOWN:
+                event_queue.push(GameEvent(EventType.KeyDown, "PYGAME", data={"key": event.key}))
+                if event.key == pg.K_SPACE:
+                    print("#" * 40)
+                    event_dispatcher.display()
+                    print("#" * 40)
             state_manager.current_state.handle_events(event)
+
+    def proccess_events(self):
+        while True:
+            event = event_queue.pop()
+            if not event:
+                break
+            event_dispatcher.dispatch(event)
+
+    def quit(self, event):
+        pg.time.delay(500)
+        sys.exit()
+        pg.quit()
 
     def update(self):
         mos_pos = pg.mouse.get_pos()
+        if not event_queue.is_empty():
+            print("#" * 40)
+            print("event_queue:", end="\t")
+            event_queue.display()
+            print("#" * 40)
+        self.proccess_events()
         state_manager.current_state.update(mos_pos, self.dt)
 
     def render(self):

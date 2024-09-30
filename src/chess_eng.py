@@ -5,6 +5,7 @@ from src.board import Board
 from src.moves import Move
 from src.resource_manager import res_manager
 from src.chess_abc import ChessAbc
+from src.eventer import GameEvent, EventType
 
 
 class ChessEng(ChessAbc):
@@ -20,6 +21,11 @@ class ChessEng(ChessAbc):
         self.full_clock = 0
         self.last_move = None
         self.history = []
+        self._handlers = {
+            EventType.MouseDown: {self.handle_mouse},
+            EventType.MouseUp: {self.handle_mouse},
+            EventType.KeyDown: {self.handle_events}
+        }
         if org:
             self.load_fnn(
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk - 0 0")
@@ -121,12 +127,11 @@ class ChessEng(ChessAbc):
         self.selected = t_square
         res_manager.get_resource("move").play()
 
-    def handle_events(self, event):
-        mos_pos = self.board.get_rel_mos_pos()
-        t_square = self.board.get_square_from_pos(mos_pos)
-        piece = self.board.get_piece(t_square)
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
+    def handle_events(self, event: GameEvent):
+
+        # match the diffrent type of keys to their appropriet stuff
+        match event.data["key"]:
+            case pg.K_SPACE:
                 print(f"command:{self.get_fnn()}")
                 if self.last_move:
                     print(f"last move: {
@@ -136,24 +141,23 @@ class ChessEng(ChessAbc):
                 w_b = self.board.get_piece(self.find_king(BL))
                 print(f"cas_w:{w_k.castling}")
                 print(f"cas_b:{w_b.castling}")
-            if event.key == pg.K_BACKSPACE:
+
+            case pg.K_BACKSPACE:
                 self.undo_move()
 
-            if event.key == pg.K_k:
-                self.load_fnn("7k/8/8/3K4/8/8/8/8 w - - 0 0")
-            if event.key == pg.K_r:
-                self.load_fnn("7k/8/8/3R4/8/8/8/7K w - - 0 0")
-            if event.key == pg.K_q:
-                self.load_fnn("7k/8/8/3Q4/8/8/8/7K w - - 0 0")
-            if event.key == pg.K_n:
-                self.load_fnn("7k/8/8/3N4/8/8/8/7K w - - 0 0")
-            if event.key == pg.K_b:
-                self.load_fnn("7k/8/8/3B4/8/8/8/7K w - - 0 0")
-        if event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1:
+    def handle_mouse(self, event: GameEvent):
+        # get the peice deppending on the mos_pos
+        mos_pos = self.board.get_rel_mos_pos()
+        t_square = self.board.get_square_from_pos(mos_pos)
+        piece = self.board.get_piece(t_square)
+
+        if event.type == EventType.MouseDown:
+            if event.data["button"] == 1:
                 if self.selected == -1 and piece and self.is_my_turn(piece):
                     self.select(t_square)
-                elif self.selected > -1:
+        if event.type == EventType.MouseUp:
+            if event.data["button"] == 1:
+                if self.selected > -1:  # this mean a piece is selected
                     current = self.board.get_piece(self.selected)
                     for mv in current.all_legal_moves:
                         if mv.end == t_square:

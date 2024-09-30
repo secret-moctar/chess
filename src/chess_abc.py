@@ -21,9 +21,6 @@ class ChessAbc(ABC):
     def is_move_valid(self, move) -> bool: ...
 
     @abstractmethod
-    def handle_events(self, event): ...
-
-    @abstractmethod
     def update(self, dt): ...
 
     @abstractmethod

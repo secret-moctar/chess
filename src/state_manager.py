@@ -13,7 +13,8 @@ class StateManager:
         return self._menus[state_id]
 
     def change_state(self, state_id):
-        del self.current_state
+        if self.current_state:
+            self.current_state.exit()
         self.current_state = self.get_state(state_id)()
 
 

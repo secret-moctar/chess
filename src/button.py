@@ -1,5 +1,6 @@
 from src.settings import *
 from src.resource_manager import res_manager
+from src.eventer import event_queue, GameEvent, EventType
 
 
 class ButtonEvent:
@@ -20,17 +21,29 @@ class Button:
         self.rect = self.img.get_rect(topleft=(0, 0)).inflate(30, 10)  # need to add these values to config
         self.bcolor = bcolor
         self.s_bcolor = s_bcolor
-        self.hightlight = False
+        self.highlight = False
         self.event = ButtonEvent(event)
 
     def draw(self):
         return self.font.render(self.text, True, self.tcolor)
 
+    def is_on(self, pos):
+        return self.rect.collidepoint(*pos)
+
+    def on_click(self, event):
+        data = event.data.copy()
+        print(f"button: {self.event}, high: {self.highlight}")
+        if self.is_on(data["pos"]) and data["button"] == 1:
+            res_manager.get_resource("button").play()
+            event_queue.push(GameEvent(EventType.UiButtonClick, "UiButton", data={"id": self.event.event_id}))
+            return True
+        return False
+
     def update(self, mos_pos):
-        if self.rect.collidepoint(*mos_pos):
-            self.hightlight = True
+        if self.is_on(mos_pos):
+            self.highlight = True
         else:
-            self.hightlight = False
+            self.highlight = False
 
 
 class CompButton(Button):
@@ -101,6 +114,18 @@ class StackButton:
         """push any thing that follow the listen, update, also and render structure if you support these three function you can be added to the stack no problem"""
         self.stack.append(button)
 
+    def get_button_clicked(self, pos):
+        for button in self.stack:
+            if button.is_clicked(pos):
+                return button.event
+
+    def on_click(self, pos):
+        return
+
+    def get_buttons(self):
+        return self.stack
+
+
     def update(self, mos_pos):
         for button in self.stack:
             button.update(mos_pos)
@@ -109,7 +134,7 @@ class StackButton:
         mon_event = []
         for button in self.stack:
             if button.event.b_type == user_event.type and button.event.b_key == user_event.button:
-                if button.hightlight:
+                if button.highlight:
                     res_manager.get_resource("button").play()
                     mon_event.append(button.event.event_id)
         return mon_event
@@ -122,7 +147,7 @@ class StackButton:
             button = self.stack[i]
             bcolor = self.bcolor if button.bcolor == "theme" else button.bcolor
             s_bcolor = self.s_bcolor if button.s_bcolor == "theme" else button.s_bcolor
-            bcolor, inflame = (bcolor, (30, 10)) if not button.hightlight else (s_bcolor, (40, 15))
+            bcolor, inflame = (bcolor, (30, 10)) if not button.highlight else (s_bcolor, (40, 15))
 
             button.rect = button.img.get_rect(center=(self.pos[0], self.pos[1] + acc)).inflate(*inflame)
             pg.draw.rect(screen, bcolor, button.rect, border_radius=roundness)
