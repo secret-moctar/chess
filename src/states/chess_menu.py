@@ -26,9 +26,6 @@ class ChessMenu(State):
             for handler in self.chess_engine._handlers[event_type]:
                 self._handlers[event_type].add(handler)
 
-    def handle_events(self, event):
-        return
-
     def update(self, mos_pos, dt):
         super().update(mos_pos, dt)
         if self.transition_screen.is_finished():

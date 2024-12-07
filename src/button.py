@@ -3,13 +3,6 @@ from src.resource_manager import res_manager
 from src.eventer import event_queue, GameEvent, EventType
 
 
-class ButtonEvent:
-    def __init__(self, event_id, b_type=pg.MOUSEBUTTONDOWN, b_key=1):
-        self.event_id = event_id
-        self.b_type = b_type
-        self.b_key = b_key
-
-
 class Button:
     def __init__(self, id, text, font, tcolor, bcolor, s_bcolor, event):
         pg.init()
@@ -22,7 +15,7 @@ class Button:
         self.bcolor = bcolor
         self.s_bcolor = s_bcolor
         self.highlight = False
-        self.event = ButtonEvent(event)
+        self.event = event
 
     def draw(self):
         return self.font.render(self.text, True, self.tcolor)
@@ -35,7 +28,7 @@ class Button:
         print(f"button: {self.event}, high: {self.highlight}")
         if self.is_on(data["pos"]) and data["button"] == 1:
             res_manager.get_resource("button").play()
-            event_queue.push(GameEvent(EventType.UiButtonClick, "UiButton", data={"id": self.event.event_id}))
+            event_queue.push(GameEvent(EventType.UiButtonClick, "UiButton", data={"id": self.event}))
             return True
         return False
 
@@ -119,12 +112,8 @@ class StackButton:
             if button.is_clicked(pos):
                 return button.event
 
-    def on_click(self, pos):
-        return
-
     def get_buttons(self):
         return self.stack
-
 
     def update(self, mos_pos):
         for button in self.stack:

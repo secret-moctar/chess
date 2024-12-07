@@ -22,7 +22,6 @@ class State:
         self._handlers[EventType.UiButtonClick].add(self.process_event)
 
     def process_event(self, event): ...
-    def handle_events(self, event): ...
     def change(self): ...
     def goto(self): ...
 
@@ -54,7 +53,6 @@ class State:
         return window
 
     def call(self, obj_id, **kwargs):
-        self.event = []
         state_manager.change_state(obj_id)
         state_manager.current_state.enter()
         transition_screen = self.custom_transition(**kwargs)
@@ -96,11 +94,18 @@ class State:
                 self.transition_screen.render(screen)
         return wrapper_function
 
+    def draw_images(self, screen):
+        for img in self.structure["imgs"].values():
+            pos = img["pos"]
+            pos = WIN_WIDTH * pos[0] - img["img"].get_width() // 2, WIN_HEIGHT * pos[1] - img["img"].get_height() // 2
+            screen.blit(img["img"], pos)
+
+    def render_stacks(self, screen):
+        for stack in self.structure["stacks"].values():
+            stack.render(screen, config.get_setting("button", "gap"), config.get_setting("button", "shape"))
+
     def render(self, screen):
-            for img in self.structure["imgs"].values():
-                pos = img["pos"]
-                pos = WIN_WIDTH * pos[0] - img["img"].get_width() // 2, WIN_HEIGHT * pos[1] - img["img"].get_height() // 2
-                screen.blit(img["img"], pos)
-            if "stacks" in self.structure:
-                for stack in self.structure["stacks"].values():
-                    stack.render(screen, config.get_setting("button", "gap"), config.get_setting("button", "shape"))
+        if "imgs" in self.structure:
+            self.draw_images(screen)
+        if "stacks" in self.structure:
+            self.render_stacks(screen)

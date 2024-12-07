@@ -4,7 +4,7 @@ from src.config_manager import config
 
 
 class Clock:
-    def __init__(self, sand=600, team=WH, rel_pos=(0, 0)):
+    def __init__(self, sand=180, team=WH, rel_pos=(0, 0)):
         self.sand = sand * 1000  # in min converting to milliseconds
         self.last = pg.time.get_ticks()
         print(f"time.start: {self.last}")

@@ -22,21 +22,38 @@ class UiEngine:
     def handle_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
+                event_queue.push(GameEvent(EventType.QuitGame, "PYGAME", data={}))
             if event.type == pg.MOUSEBUTTONDOWN:
-                event_queue.push(GameEvent(EventType.MouseDown, "PYGAME", data={"pos":event.pos, "button": event.button}))
+                event_queue.push(
+                    GameEvent(
+                        EventType.MouseDown,
+                        "PYGAME",
+                        data={"pos": event.pos, "button": event.button},
+                    )
+                )
             if event.type == pg.MOUSEBUTTONUP:
-                event_queue.push(GameEvent(EventType.MouseUp, "PYGAME", data={"pos":event.pos, "button": event.button}))
+                event_queue.push(
+                    GameEvent(
+                        EventType.MouseUp,
+                        "PYGAME",
+                        data={"pos": event.pos, "button": event.button},
+                    )
+                )
             if event.type == pg.KEYDOWN:
-                event_queue.push(GameEvent(EventType.KeyDown, "PYGAME", data={"key": event.key}))
+                event_queue.push(
+                    GameEvent(EventType.KeyDown, "PYGAME", data={"key": event.key})
+                )
                 if event.key == pg.K_SPACE:
                     print("#" * 40)
                     event_dispatcher.display()
                     print("#" * 40)
-            state_manager.current_state.handle_events(event)
 
     def proccess_events(self):
+        if not event_queue.is_empty():
+            print("#" * 40)
+            print("event_queue:", end="\t")
+            event_queue.display()
+            print("#" * 40)
         while True:
             event = event_queue.pop()
             if not event:
@@ -50,12 +67,6 @@ class UiEngine:
 
     def update(self):
         mos_pos = pg.mouse.get_pos()
-        if not event_queue.is_empty():
-            print("#" * 40)
-            print("event_queue:", end="\t")
-            event_queue.display()
-            print("#" * 40)
-        self.proccess_events()
         state_manager.current_state.update(mos_pos, self.dt)
 
     def render(self):
@@ -66,6 +77,7 @@ class UiEngine:
         while True:
             pg.display.set_caption(f"FPS: {self.clock.get_fps() // 1}")
             self.handle_events()
+            self.proccess_events()
             self.update()
             self.render()
             pg.display.flip()
